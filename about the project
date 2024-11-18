@@ -1,0 +1,27 @@
+Project Description: Email Scheduling and Analytics Application
+This project is a Flask-based web application that allows users to schedule, send, and track emails efficiently. It integrates with Sendinblue (Brevo) as the email service provider and provides real-time analytics on email statuses (sent, delivered, opened, and bounced). The application also supports scheduling emails with precise intervals, customizable content generation using OpenAI, and dynamic placeholders for personalized email campaigns.
+
+Technologies and Languages Used:
+
+Frontend:
+HTML/CSS/JavaScript: For designing the user interface, forms, and dashboards.
+Date-Time Picker: For scheduling emails.
+
+Backend:
+Python (Flask): For handling API requests, routing, and backend logic.
+Celery: For scheduling and executing asynchronous tasks like email sending.
+Redis: As the message broker for Celery tasks.
+OpenAI API: For generating dynamic email content using prompts.
+Sendinblue API: For sending emails and tracking delivery statuses.
+
+Database:
+MongoDB: For storing email logs, user data, and analytics.
+
+Other Tools:
+Bootstrap: For enhancing the UI design.
+REST APIs: For integrating frontend and backend functionalities.
+Python Libraries:
+pandas for CSV processing.
+certifi for SSL certificates.
+requests for API calls.
+dotenv for environment variable management.
