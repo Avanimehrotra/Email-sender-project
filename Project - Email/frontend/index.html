@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Email</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input, textarea, button {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        input:focus, textarea:focus, button:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .success {
+            color: #28a745;
+        }
+
+        .error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Send Email</h1>
+        <form id="emailForm">
+            <label for="recipient">Recipient Email</label>
+            <input type="email" id="recipient" placeholder="Enter recipient's email" required>
+
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" placeholder="Enter the subject" required>
+
+            <label for="body">Message</label>
+            <textarea id="body" rows="5" placeholder="Enter your message" required></textarea>
+
+            <button type="submit">Send Email</button>
+        </form>
+        <p id="feedback" class="success" style="display:none;"></p>
+        <p id="error" class="error" style="display:none;"></p>
+    </div>
+
+    <div class="container">
+        <h1>Schedule Email</h1>
+        <form id="scheduleEmailForm">
+            <label for="schedule-recipient">Recipient Email</label>
+            <input type="email" id="schedule-recipient" placeholder="Enter recipient's email" required>
+
+            <label for="schedule-subject">Subject</label>
+            <input type="text" id="schedule-subject" placeholder="Enter the subject" required>
+
+            <label for="schedule-body">Message</label>
+            <textarea id="schedule-body" rows="5" placeholder="Enter your message" required></textarea>
+
+            <label for="send_time">Send Time</label>
+            <input type="datetime-local" id="send_time" required>
+
+            <button type="submit">Schedule Email</button>
+        </form>
+        <p id="schedule-feedback" class="success" style="display:none;"></p>
+        <p id="schedule-error" class="error" style="display:none;"></p>
+    </div>
+
+    <script>
+        // Send Email Functionality
+        document.getElementById("emailForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const recipient = document.getElementById("recipient").value;
+            const subject = document.getElementById("subject").value;
+            const body = document.getElementById("body").value;
+
+            const feedback = document.getElementById("feedback");
+            const errorElement = document.getElementById("error");
+
+            feedback.style.display = "none";
+            errorElement.style.display = "none";
+
+            fetch("http://127.0.0.1:5000/api/send_email", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    recipient: recipient,
+                    subject: subject,
+                    body: `<html><body>${body}</body></html>`
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                feedback.textContent = "Email sent successfully: " + data.message;
+                feedback.style.display = "block";
+            })
+            .catch(error => {
+                errorElement.textContent = "Error sending email: " + error.message;
+                errorElement.style.display = "block";
+            });
+        });
+
+        // Schedule Email Functionality
+        document.getElementById("scheduleEmailForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const emailData = {
+                recipient: document.getElementById("schedule-recipient").value,
+                subject: document.getElementById("schedule-subject").value,
+                body: document.getElementById("schedule-body").value,
+                send_time: document.getElementById("send_time").value
+            };
+
+            const scheduleFeedback = document.getElementById("schedule-feedback");
+            const scheduleErrorElement = document.getElementById("schedule-error");
+
+            scheduleFeedback.style.display = "none";
+            scheduleErrorElement.style.display = "none";
+
+            try {
+                const response = await fetch("/api/schedule_email", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(emailData)
+                });
+                const result = await response.json();
+                scheduleFeedback.textContent = result.message || "Email scheduled successfully!";
+                scheduleFeedback.style.display = "block";
+            } catch (error) {
+                scheduleErrorElement.textContent = "Error scheduling email: " + error.message;
+                scheduleErrorElement.style.display = "block";
+            }
+        });
+    </script>
+</body>
+</html>

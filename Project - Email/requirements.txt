@@ -1,0 +1,6 @@
+Flask==3.0.3
+pandas
+pymongo
+requests
+celery
+redis
